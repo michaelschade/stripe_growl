@@ -82,6 +82,10 @@ class StripeNotifier(object):
                 type    = 'charge.succeeded',
                 count   = self.max_events,
             )
+        except self.stripe.StripeError, e:
+            msg = e.json_body['error']['message']
+            self._notify('error', '%s: Error' % APP_NAME, msg)
+            return False
         except:
             self._notify(
                 'error', '%s: Error' % APP_NAME, 'Unable to retrieve Events.'
