@@ -24,32 +24,7 @@ Usage
 Standalone
 ----------
 
-The following configuration is exposed through environment variables:
-
-* `SGROWL_API_KEY` (string, **required**): Your Stripe secret API key.
-
-* `SGROWL_MAX_EVENTS` (int, default: 4): The maximum number of events to
-display with Growl for each poll.
-
-* `SGROWL_POLL_INTERVAL` (int, default: 5 minutes, minimum: 1 minute): The
-number of minutes in between each polling of the Stripe.com API for new Events.
-**Please do not modify the script to go below 1 minute. Keeping it at or above
-5 minutes is preferable.**
-
-The program can then be run via command line:
-
-    SGROWL_API_KEY=supers3cret python stripe_growl.py
-
-or, if you want to show up to 8 events at a time:
-
-    SGROWL_API_KEY=supers3cret SGROWL_MAX_EVENTS=8 python stripe_growl.py
-
-To run the script in the background, you could do:
-
-    SGROWL_API_KEY=supers3cret nohup python stripe_growl.py &
-
-The program will only begin retrieving events created after it has been
-started.
+Run `python stripe_growl.py -h` for an explanation of the configuration options.
 
 In Your Own Code
 ----------------

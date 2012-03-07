@@ -1,12 +1,4 @@
-# General config
-APP_NAME      = 'Stripe Growl'
-MAX_EVENTS    = 4
-POLL_INTERVAL = 5 # Minutes
-
-# Environment variables
-ENV_API  = 'SGROWL_API_KEY'
-ENV_ME   = 'SGROWL_MAX_EVENTS'
-ENV_POLL = 'SGROWL_POLL_INTERVAL'
+APP_NAME = 'Stripe Growl'
 
 class StripeNotifier(object):
     NOTIFICATIONS = [
@@ -17,19 +9,19 @@ class StripeNotifier(object):
         'charge.succeeded',
     ]
 
-    def __init__(self, api_key, since_id=None, max_events=None):
+    def __init__(self, api_key, max_events, since_id=None):
         """
+        max_events: if None, defaults to 4. This is the maximum number of event
+        notifications that Growl will display during a single poll.
+
         since_id: a POSIX timestamp in UTC that is used to filter Stripe
         events. If None, defaults to the current time (in UTC).
-
-        Max events: if None, defaults to 4. This is the maximum number of event
-        notifications that Growl will display during a single poll.
         """
         # Setup Stripe
         import stripe
         self.stripe         = stripe
         self.stripe.api_key = api_key
-        self.max_events     = max_events or MAX_EVENTS
+        self.max_events     = max_events
         # Specified 'latest known' event (or right now)
         from time import time
         self.since_id = since_id or int(time())
@@ -111,25 +103,34 @@ class StripeNotifier(object):
             return True
 
 if __name__ == '__main__':
-    # Check / Retrieve Stripe.com API key
-    import sys
-    import os
-    if not os.environ.has_key(ENV_API):
-        sys.stderr.write('ERR: You must provide your Stripe API key using the'
-            ' %s environment variable.\n' % ENV_API)
-        sys.exit(1)
+    # Setup argument parser
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='Receive Growl notifications of Stripe events',
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument('key', type=str, help='Your Stripe secret API key.')
+    parser.add_argument(
+        '--poll-events', type=int, default=4,
+        help='Maximum number of events to display at a time.'
+    )
+    parser.add_argument(
+        '--poll-interval', type=int, default=5,
+        help='Delay (in minutes) between polls for Stripe events (minimum: 5)'
+    )
+    args = vars(parser.parse_args())
     # Start notifier
     sn = StripeNotifier(
-        api_key     = os.environ[ENV_API],
-        max_events  = int(os.environ.get(ENV_ME, MAX_EVENTS)),
+        api_key     = args['key'],
+        max_events  = args['poll_events'],
     )
     from time import sleep
-    poll = int(os.environ.get(ENV_POLL, POLL_INTERVAL))
-    if poll < 1:
+    if args['poll_interval'] < 1:
+        import sys
         sys.stderr.write('ERR: You cannot provide a polling interval under'
             ' 1 minute. The preference is that you keep it at or above 5'
             ' minutes.\n')
         sys.exit(1)
     while True:
         sn.poll()
-        sleep(poll * 60)
+        sleep(args['poll_interval'] * 60)
