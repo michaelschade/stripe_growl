@@ -8,7 +8,7 @@ if version_info < (2, 7):
 
 setup(
     name            = 'stripe_growl',
-    version         = '0.1.0',
+    version         = '0.2.0',
     author          = 'Michael Schade',
     author_email    = 'michael@mschade.me',
     url             = 'https://github.com/michaelschade/stripe_growl/',
