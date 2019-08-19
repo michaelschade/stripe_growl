@@ -6,7 +6,7 @@ Created by [Michael Schade](https://twitter.com/#!/sch).
 Example
 =======
 
-![New Charge Notifications](/michaelschade/stripe_growl/raw/master/examples/newcharge.png)
+![New Charge Notifications](https://github.com/michaelschade/stripe_growl/raw/master/examples/newcharge.png)
 
 Requirements
 ============
